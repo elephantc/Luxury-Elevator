@@ -125,8 +125,28 @@ void gotoxy(int x, int y){
 }
 
 
-int find_Ev(int input1,int input2){
+int find_EV(int from, int to)
+{
+	if(flag==0)
+		return min(dis(from))
+
+	else if (from - to > 0)
+		{
+
+		}
+
+	else
+
+}
+
+int min()    // 
+{
 
 }
 
 
+int dist(int ev_num,int floor)  // current층 까지의 거리를 구하는 함수
+{
+
+
+}
