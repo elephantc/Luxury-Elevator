@@ -123,3 +123,10 @@ void gotoxy(int x, int y){
 	fflush(stdout);
 
 }
+
+
+int find_Ev(int input1,int input2){
+
+}
+
+
