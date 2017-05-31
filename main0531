@@ -1,0 +1,200 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <time.h>
+
+#define EV_MAX 6
+#define FLOOR_MAX 20
+
+
+pthread_t thread;
+pthread_t thread2;
+
+void *thread_timeflow();//시간흐름에 따른 EV상태변화
+void *thread_show(); //모든 출력제어
+
+void print_menu();//메뉴보여주는 함수(이동,프로그램종료,시뮬레이션정지 등)
+void print_EV();//EV이미지 보여주는 함수
+void print_log();//EV log 보여주는 함수(5개정도?)
+void choice_EV(int from,int to);//사용자 입력에  따라 EV선택,기록하는 함수
+
+void clear(int startline,int endline);
+void gotoxy(int x,int y);
+
+struct elevator {
+
+        int current;
+        int stop[FLOOR_MAX];
+};
+
+struct elevator EV[EV_MAX];
+
+int main(){
+
+        int menu=99; //몇번 메뉴를 선택했는지
+        int from,to; //EV 요청층과 목적층
+
+        int i,j;
+
+        int simul_work=0;
+
+
+        //초기화
+        for(i=0;i<EV_MAX;i++){
+                EV[i].current=0;
+                for(j=0;j<FLOOR_MAX;j++){
+                        EV[i].stop[j]=0;
+                }
+        }
+
+        pthread_create(&thread2,NULL,&thread_show,NULL);
+
+        while(menu!=0) //menu가 0이면 프로그램 종료
+        {
+                scanf("%d",&menu);
+
+                switch(menu){
+                        case 1: //시뮬레이션시작
+                                if(simul_work==0){
+                                        pthread_create(&thread,NULL,&thread_timeflow,NULL);
+                                        simul_work=1;}
+                                break;
+                        case 2: //시뮬레이션 정지
+                                pthread_cancel(thread);
+                                simul_work=0;
+                                break;
+                        case 3: //EV이동요청
+                                scanf("%d %d",&from, &to);
+                                choice_EV(from,to);
+                                break;
+
+                        default://error message
+                                break;
+                }
+        }
+        clear(0,100);
+        printf("엘리베이터 프로그램이 종료 되었습니다.\n");
+        pthread_cancel(thread);
+        pthread_cancel(thread2);
+        return 0;
+}
+
+void *thread_timeflow(){
+        while(1){
+                sleep(1);
+        }
+};
+void *thread_show(){
+
+        int flag=0;//flag==0인경우 EV 움직임이 없다
+        int i,j;
+
+        clear(0,100);
+        print_EV();
+        print_menu();
+
+        while(1){
+                for(i=0;i<EV_MAX;i++){
+                        for(j=0;j<FLOOR_MAX;j++){
+                                flag+=EV[i].stop[j];
+                        }
+                }
+
+                if(flag!=0){
+                        print_EV();
+                        print_menu();
+                        flag=0;
+                }
+        }
+};
+
+void choice_EV(int from,int to){
+
+        int choice;
+                                                                                     62,2-16       40%
+        //...
+
+        EV[choice].stop[from]=1;
+        EV[choice].stop[to]=0;
+
+
+}
+void print_menu(){
+        int x=0,y=1;
+        gotoxy(x,y++);
+        printf("=================================\n");
+        gotoxy(x,y++);
+        printf("1. 시뮬레이션 시작\n");
+        gotoxy(x,y++);
+        printf("2. 시뮬레이션 정지\n");
+        gotoxy(x,y++);
+        printf("3. EV 이동요청\n");
+        //gotoxy(x,y++);
+        //printf("4. 엘레베이터 고치기\n");
+        gotoxy(x,y++);
+        printf("0. 종료\n");
+        gotoxy(x,y++);
+        printf("==================================\n");
+        gotoxy(x,y++);
+
+}
+void print_EV(){
+
+        int x=40,y=1;
+        gotoxy(x,y++);
+        printf("__________________________________________\n");
+        gotoxy(x,y++);
+        printf("|-----||-----||-----||-----||-----||-----|\n");
+
+
+        for(int i=FLOOR_MAX-1;i>=0;i--){
+                gotoxy(x,y++);
+                for(int j=0;j<EV_MAX;j++){
+                        if(i==EV[j].current){
+
+                                //올라가는 중인지 내려가는 중인지 계산하기
+                                int stopby=i;
+                                for(int k=0;k<EV_MAX;k++){
+                                        if(EV[j].stop[k]==1) stopby=k;
+                                }
+
+                                if(stopby-i>0) printf("│  ▲  │"); //가야할 곳이 현재층(i)보다 크다=상승
+                                else if(stopby-i>0) printf("│  ▼  │"); //작다=하강
+                                else printf("│  ■  │"); //같다면 정지중
+
+                        }else{
+
+                                printf("│     │");
+
+                        }
+
+                }
+                                                                                     166,0-1       81%
+ gotoxy(x,y++);
+                printf("|-----||-----||-----||-----||-----||-----| %dfloor\n",i+1);
+
+        }
+
+}
+void print_log(){
+
+
+
+}
+
+void clear(int startline,int endline)
+{
+        int i;
+        gotoxy(0,0);
+        for(i=startline;i<=endline;i++)
+        printf("                                                                                \n");
+        gotoxy(0,1);
+}
+void gotoxy(int x, int y){
+
+        printf("\033[%d;%df",y,x);
+        fflush(stdout);
+
+}
+                                              
+                                                                                     1,15       꼭대기
