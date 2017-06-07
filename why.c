@@ -190,7 +190,7 @@ int main(){
 					if(e_num<EV_MAX&&e_num>=0&&cancel<20&&cancel>=0)
 					{
 						if(cancel_floor==-1)
-							strncpy(str[2],"     !목적층애 없습니다! 재입력     ",SECONDLINE-1);
+							strncpy(str[2],"     !목적층 없습니다! 재입력     ",SECONDLINE-1);
 						else {
 							EV[e_num].stop[cancel_floor]=0;
 							 strncpy(str[2],"      층 취소완료               ",SECONDLINE-1);
